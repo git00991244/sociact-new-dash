@@ -1,394 +1,295 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Slider } from './ui/slider';
+import { 
+  Image as ImageIcon, 
+  Wand2,
+  Download,
+  RefreshCw,
+  Settings,
+  Sparkles,
+  Upload,
+  Copy,
+  Heart,
+  Share2,
+  Eye
+} from 'lucide-react';
 
 const ImageGeneration = () => {
-  const [prompt, setPrompt] = useState('');
-  const [style, setStyle] = useState('realistic');
-  const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [quality, setQuality] = useState([85]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generateProgress, setGenerateProgress] = useState(0);
-  const [generatedImages, setGeneratedImages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const mockImages = [
+  const [prompt, setPrompt] = useState('');
+  const [generatedImages, setGeneratedImages] = useState([
     {
       id: 1,
-      prompt: 'A futuristic AI robot in a modern office',
-      url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400',
-      style: 'realistic',
+      url: 'https://images.unsplash.com/photo-1720962158789-9389a4f399da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      prompt: 'Modern tech interface with holographic elements',
       timestamp: '2 mins ago',
-      downloads: 45,
-      likes: 23
+      likes: 24,
+      downloads: 12
     },
     {
       id: 2,
-      prompt: 'Colorful abstract digital art with geometric patterns',
-      url: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400',
-      style: 'abstract',
+      url: 'https://images.unsplash.com/photo-1720962158858-5fb16991d2b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      prompt: 'Colorful AI dashboard with data visualization',
       timestamp: '5 mins ago',
-      downloads: 67,
-      likes: 34
+      likes: 18,
+      downloads: 8
     },
     {
       id: 3,
-      prompt: 'Professional portrait of a business person',
-      url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-      style: 'portrait',
-      timestamp: '8 mins ago',
-      downloads: 89,
-      likes: 56
-    },
-    {
-      id: 4,
-      prompt: 'Stunning landscape with mountains and sunset',
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-      style: 'landscape',
-      timestamp: '12 mins ago',
-      downloads: 123,
-      likes: 78
+      url: 'https://images.unsplash.com/photo-1590417286292-4274afeee179?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxkaWdpdGFsJTIwd29ya3NwYWNlfGVufDB8fHx8MTc1MzAxMDM1MHww&ixlib=rb-4.1.0&q=85',
+      prompt: 'Clean workspace with modern technology',
+      timestamp: '10 mins ago',
+      likes: 32,
+      downloads: 15
     }
-  ];
+  ]);
 
-  useEffect(() => {
-    if (isGenerating) {
-      const interval = setInterval(() => {
-        setGenerateProgress(prev => {
-          if (prev >= 100) {
-            setIsGenerating(false);
-            
-            // Add new generated image
-            const newImage = {
-              id: Date.now(),
-              prompt: prompt,
-              url: mockImages[Math.floor(Math.random() * mockImages.length)].url,
-              style: style,
-              timestamp: 'just now',
-              downloads: 0,
-              likes: 0
-            };
-            
-            setGeneratedImages(prev => [newImage, ...prev]);
-            return 0;
-          }
-          return prev + Math.random() * 12;
-        });
-      }, 200);
-      return () => clearInterval(interval);
-    }
-  }, [isGenerating, prompt, style]);
+  const [imageStyles] = useState([
+    'Photorealistic', 'Digital Art', 'Oil Painting', 'Watercolor', 
+    'Sketch', 'Anime', 'Cartoon', 'Abstract', 'Minimalist', 'Vintage'
+  ]);
 
-  const handleGenerate = () => {
-    if (!prompt.trim()) {
-      alert('Please enter a prompt for image generation');
-      return;
-    }
+  const [selectedStyle, setSelectedStyle] = useState('Photorealistic');
+
+  const generateImages = () => {
+    if (!prompt.trim()) return;
+    
     setIsGenerating(true);
-    setGenerateProgress(0);
+    
+    // Simulate image generation process
+    setTimeout(() => {
+      const newImage = {
+        id: Date.now(),
+        url: `https://images.unsplash.com/photo-1720962158883-b0f2021fb51e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwzfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85`,
+        prompt: prompt,
+        timestamp: 'Just now',
+        likes: 0,
+        downloads: 0
+      };
+      setGeneratedImages(prev => [newImage, ...prev]);
+      setIsGenerating(false);
+      setPrompt('');
+    }, 4000);
   };
-
-  const handleDownload = (image) => {
-    const updatedImages = generatedImages.map(img => 
-      img.id === image.id ? { ...img, downloads: img.downloads + 1 } : img
-    );
-    setGeneratedImages(updatedImages);
-  };
-
-  const handleLike = (image) => {
-    const updatedImages = generatedImages.map(img => 
-      img.id === image.id ? { ...img, likes: img.likes + 1 } : img
-    );
-    setGeneratedImages(updatedImages);
-  };
-
-  const styles = [
-    { value: 'realistic', label: 'Realistic' },
-    { value: 'artistic', label: 'Artistic' },
-    { value: 'abstract', label: 'Abstract' },
-    { value: 'cartoon', label: 'Cartoon' },
-    { value: 'portrait', label: 'Portrait' },
-    { value: 'landscape', label: 'Landscape' },
-    { value: 'digital-art', label: 'Digital Art' },
-    { value: 'vintage', label: 'Vintage' }
-  ];
-
-  const ratios = [
-    { value: '1:1', label: 'Square (1:1)' },
-    { value: '16:9', label: 'Landscape (16:9)' },
-    { value: '9:16', label: 'Portrait (9:16)' },
-    { value: '4:3', label: 'Standard (4:3)' },
-    { value: '3:2', label: 'Photo (3:2)' }
-  ];
-
-  const allImages = [...generatedImages, ...mockImages];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <div className="p-8 space-y-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-2xl">
-              🖼️
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">AI Image Generation</h1>
-              <p className="text-slate-400">Create stunning visuals and graphics for your social media campaigns</p>
-            </div>
-            <div className="ml-auto flex gap-2">
-              <Badge variant="secondary" className="bg-green-500/20 text-green-400">
-                🟢 AI Online
-              </Badge>
-              <Badge variant="secondary">
-                {generatedImages.length + mockImages.length} Images
-              </Badge>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+              <ImageIcon className="h-8 w-8 mr-3 text-pink-400" />
+              AI Image Generation
+            </h1>
+            <p className="text-slate-400">Create stunning visuals and graphics for your social media campaigns</p>
           </div>
+          <Badge variant="outline" className="border-pink-400 text-pink-400 animate-pulse">
+            <div className="w-2 h-2 bg-pink-400 rounded-full mr-2"></div>
+            Processing
+          </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-12 gap-6">
           {/* Generation Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span>⚡</span>
-                  Generate Image
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Prompt</label>
-                  <Textarea
-                    placeholder="Describe the image you want to create..."
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
-                  />
+          <div className="col-span-4 space-y-6">
+            <Card className="p-6 bg-slate-800/50 border-slate-700">
+              <h3 className="text-xl font-semibold text-white mb-4">Create Image</h3>
+              
+              {/* Prompt Input */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Describe your image
+                </label>
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="A futuristic cityscape at sunset with flying cars and neon lights..."
+                  className="w-full h-24 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
+                />
+              </div>
+
+              {/* Style Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Art Style
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {imageStyles.map((style) => (
+                    <button
+                      key={style}
+                      onClick={() => setSelectedStyle(style)}
+                      className={`p-2 text-xs rounded-lg transition-colors ${
+                        selectedStyle === style
+                          ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30'
+                          : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
+                      }`}
+                    >
+                      {style}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Style</label>
-                  <Select value={style} onValueChange={setStyle}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {styles.map(s => (
-                        <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Aspect Ratio</label>
-                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {ratios.map(r => (
-                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">
-                    Quality: {quality[0]}%
-                  </label>
-                  <Slider
-                    value={quality}
-                    onValueChange={setQuality}
-                    max={100}
-                    min={50}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-
-                {isGenerating && (
-                  <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-green-400 font-medium">Generating Image...</span>
-                      <span className="text-green-400">{Math.round(generateProgress)}%</span>
-                    </div>
-                    <Progress value={generateProgress} className="h-2" />
-                    <p className="text-sm text-slate-400 mt-2">AI is creating your masterpiece...</p>
-                  </div>
-                )}
-
+              {/* Generation Controls */}
+              <div className="space-y-4">
                 <Button
-                  onClick={handleGenerate}
+                  onClick={generateImages}
                   disabled={isGenerating || !prompt.trim()}
-                  className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500"
+                  className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600"
                 >
                   {isGenerating ? (
                     <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white/20 border-t-white rounded-full mr-2"></div>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
                       Generating...
                     </>
                   ) : (
-                    <>🎨 Generate Image</>
+                    <>
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Generate Images
+                    </>
                   )}
                 </Button>
-              </CardContent>
+
+                {isGenerating && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-400">Processing prompt...</span>
+                      <span className="text-white">65%</span>
+                    </div>
+                    <Progress value={65} className="h-2 bg-slate-700">
+                      <div className="h-full bg-gradient-to-r from-pink-500 to-red-500 transition-all duration-500 rounded-full" style={{ width: '65%' }}></div>
+                    </Progress>
+                  </div>
+                )}
+              </div>
             </Card>
 
-            {/* Quick Prompts */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">💡 Quick Prompts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {[
-                    'Social media post background',
-                    'Professional headshot',
-                    'Product photography',
-                    'Abstract art pattern',
-                    'Corporate banner design'
-                  ].map((quickPrompt, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start text-xs"
-                      onClick={() => setPrompt(quickPrompt)}
-                    >
-                      {quickPrompt}
-                    </Button>
-                  ))}
+            {/* Settings */}
+            <Card className="p-4 bg-slate-800/50 border-slate-700">
+              <h4 className="font-semibold text-white mb-3 flex items-center">
+                <Settings className="h-4 w-4 mr-2" />
+                Generation Settings
+              </h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Image Quality</label>
+                  <select className="w-full px-2 py-1 bg-slate-700/50 border border-slate-600 rounded text-white text-sm">
+                    <option>High Quality</option>
+                    <option>Standard</option>
+                    <option>Fast</option>
+                  </select>
                 </div>
-              </CardContent>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Aspect Ratio</label>
+                  <select className="w-full px-2 py-1 bg-slate-700/50 border border-slate-600 rounded text-white text-sm">
+                    <option>1:1 Square</option>
+                    <option>16:9 Landscape</option>
+                    <option>9:16 Portrait</option>
+                  </select>
+                </div>
+              </div>
+            </Card>
+
+            {/* Statistics */}
+            <Card className="p-4 bg-slate-800/50 border-slate-700">
+              <h4 className="font-semibold text-white mb-3">Today's Stats</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-sm">Images Generated</span>
+                  <span className="text-white font-semibold">156</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-sm">Downloads</span>
+                  <span className="text-white font-semibold">89</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-sm">Favorites</span>
+                  <span className="text-white font-semibold">47</span>
+                </div>
+              </div>
             </Card>
           </div>
 
-          {/* Gallery */}
-          <div className="lg:col-span-3 space-y-6">
-            {selectedImage && (
-              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-6">
-                    <img
-                      src={selectedImage.url}
-                      alt={selectedImage.prompt}
-                      className="w-64 h-64 object-cover rounded-lg"
+          {/* Generated Images Gallery */}
+          <div className="col-span-8">
+            <Card className="p-6 bg-slate-800/50 border-slate-700">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-white">Generated Images</h3>
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="outline" className="border-slate-600">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                  </Button>
+                  <Button size="sm" variant="outline" className="border-slate-600">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {generatedImages.map((image) => (
+                  <div key={image.id} className="group relative bg-slate-700/30 rounded-lg overflow-hidden">
+                    <img 
+                      src={image.url} 
+                      alt={image.prompt}
+                      className="w-full h-48 object-cover"
                     />
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">Selected Image</h3>
-                      <p className="text-slate-300 mb-4">{selectedImage.prompt}</p>
-                      <div className="flex items-center gap-4 mb-4">
-                        <Badge variant="outline">{selectedImage.style}</Badge>
-                        <span className="text-sm text-slate-400">{selectedImage.timestamp}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">❤️ {selectedImage.likes}</span>
-                          <span className="text-sm">📥 {selectedImage.downloads}</span>
-                        </div>
+                    
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="flex items-center space-x-2">
+                        <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30">
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30">
+                          <Copy className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div className="flex gap-3">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-500">
-                          📥 Download HD
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          ✏️ Edit
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          🔄 Generate Similar
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedImage(null)}
-                        >
-                          ✕ Close
-                        </Button>
+                    </div>
+
+                    {/* Image Info */}
+                    <div className="p-3">
+                      <p className="text-sm text-slate-300 truncate mb-2">{image.prompt}</p>
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>{image.timestamp}</span>
+                        <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-1">
+                            <Heart className="h-3 w-3" />
+                            <span>{image.likes}</span>
+                          </div>
+                        <div className="flex items-center space-x-1">
+                          <Download className="h-3 w-3" />
+                          <span>{image.downloads}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Generated Images</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {allImages.map((image) => (
-                    <div
-                      key={image.id}
-                      className="group relative bg-slate-700/30 rounded-lg overflow-hidden hover:bg-slate-700/50 transition-all duration-200 cursor-pointer"
-                      onClick={() => setSelectedImage(image)}
-                    >
-                      <img
-                        src={image.url}
-                        alt={image.prompt}
-                        className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
-                      
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 bg-white/20 hover:bg-white/30"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleLike(image);
-                            }}
-                          >
-                            ❤️
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 bg-white/20 hover:bg-white/30"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownload(image);
-                            }}
-                          >
-                            📥
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="p-3">
-                        <p className="text-xs text-slate-300 truncate mb-2">{image.prompt}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs">{image.style}</Badge>
-                          <span className="text-xs text-slate-500">{image.timestamp}</span>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="flex gap-3 text-xs text-slate-400">
-                            <span>❤️ {image.likes}</span>
-                            <span>📥 {image.downloads}</span>
-                          </div>
-                          {image.timestamp === 'just now' && (
-                            <Badge variant="default" className="bg-green-500 text-xs">New</Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              ))}
+            </div>
+
+            {/* Load More */}
+            <div className="text-center mt-6">
+              <Button variant="outline" className="border-slate-600">
+                Load More Images
+              </Button>
+            </div>
+          </Card>
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
