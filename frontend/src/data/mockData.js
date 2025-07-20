@@ -262,8 +262,6 @@ export const activityFeed = mockData.recentActivities;
 export const quickActions = mockData.quickActions.map((action, index) => ({ id: index, ...action }));
 export const todaysStats = mockData.stats.map(stat => ({ icon: stat.icon === 'video' ? '🎥' : stat.icon === 'image' ? '🖼️' : stat.icon === 'comment' ? '💬' : '✂️', label: stat.label, value: stat.value }));
 
-
-
 export const commandOptions = {
   actions: [
     'Generate video',
