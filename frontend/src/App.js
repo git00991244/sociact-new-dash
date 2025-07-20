@@ -3,6 +3,9 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Sidebar from "./components/Sidebar";
+import CommentAutomation from "./components/CommentAutomation";
+import ImageGeneration from "./components/ImageGeneration";
+import VideoGeneration from "./components/VideoGeneration";
 
 function App() {
   const [currentPath, setCurrentPath] = useState('/dashboard');
@@ -22,6 +25,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/comment-automation" element={<CommentAutomation />} />
+              <Route path="/image-generation" element={<ImageGeneration />} />
+              <Route path="/video-generation" element={<VideoGeneration />} />
               <Route 
                 path="/analytics" 
                 element={
@@ -29,39 +35,6 @@ function App() {
                     <div className="max-w-4xl mx-auto">
                       <h1 className="text-3xl font-bold mb-4">Analytics Dashboard</h1>
                       <p className="text-slate-400">Coming soon... This will show detailed analytics and insights.</p>
-                    </div>
-                  </div>
-                } 
-              />
-              <Route 
-                path="/comment-automation" 
-                element={
-                  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
-                    <div className="max-w-4xl mx-auto">
-                      <h1 className="text-3xl font-bold mb-4">Comment Automation</h1>
-                      <p className="text-slate-400">Automate engaging comments on YouTube and Instagram with AI-powered responses.</p>
-                    </div>
-                  </div>
-                } 
-              />
-              <Route 
-                path="/image-generation" 
-                element={
-                  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
-                    <div className="max-w-4xl mx-auto">
-                      <h1 className="text-3xl font-bold mb-4">AI Image Generation</h1>
-                      <p className="text-slate-400">Create stunning visuals and graphics for your social media campaigns.</p>
-                    </div>
-                  </div>
-                } 
-              />
-              <Route 
-                path="/video-generation" 
-                element={
-                  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
-                    <div className="max-w-4xl mx-auto">
-                      <h1 className="text-3xl font-bold mb-4">Video Generation</h1>
-                      <p className="text-slate-400">Generate professional videos with AI avatars and automated editing.</p>
                     </div>
                   </div>
                 } 
