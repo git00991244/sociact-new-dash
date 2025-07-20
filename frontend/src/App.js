@@ -12,30 +12,48 @@ import ProductAdCreator from "./components/ProductAdCreator";
 import AvatarStudio from "./components/AvatarStudio";
 
 function App() {
-  const [currentPath, setCurrentPath] = useState('/dashboard');
-  const [currentPageTitle, setCurrentPageTitle] = useState('Dashboard');
+  const [activePage, setActivePage] = useState('overview');
 
-  const handleNavigation = (path, label) => {
-    setCurrentPath(path);
-    setCurrentPageTitle(label);
+  const renderActivePage = () => {
+    switch (activePage) {
+      case 'overview':
+        return <Dashboard activePage={activePage} setActivePage={setActivePage} />;
+      case 'comment-automation':
+        return <CommentAutomation />;
+      case 'image-generation':
+        return <ImageGeneration />;
+      case 'video-generation':
+        return <VideoGeneration />;
+      case 'analytics':
+        return <Dashboard activePage={activePage} setActivePage={setActivePage} />;
+      case 'auto-video-editor':
+        return <AutoVideoEditor />;
+      case 'ugc-ads':
+        return <UGCAdCreator />;
+      case 'product-ads':
+        return <ProductAdCreator />;
+      case 'avatar-studio':
+        return <AvatarStudio />;
+      case 'settings':
+        return <Dashboard activePage={activePage} setActivePage={setActivePage} />;
+      default:
+        return <Dashboard activePage={activePage} setActivePage={setActivePage} />;
+    }
   };
 
   return (
     <div className="App">
       <BrowserRouter>
-        <div className="flex min-h-screen bg-slate-900">
-          <Sidebar currentPath={currentPath} onNavigate={handleNavigation} />
-          <div className="flex-1">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/comment-automation" element={<CommentAutomation />} />
-              <Route path="/image-generation" element={<ImageGeneration />} />
-              <Route path="/video-generation" element={<VideoGeneration />} />
-              <Route path="/auto-video-editor" element={<AutoVideoEditor />} />
-              <Route path="/ugc-ads" element={<UGCAdCreator />} />
-              <Route path="/product-ads" element={<ProductAdCreator />} />
-              <Route path="/avatar-studio" element={<AvatarStudio />} />
+        <Routes>
+          <Route path="/" element={renderActivePage()} />
+          <Route path="/dashboard" element={<Dashboard activePage="overview" setActivePage={setActivePage} />} />
+          <Route path="/comment-automation" element={<CommentAutomation />} />
+          <Route path="/image-generation" element={<ImageGeneration />} />
+          <Route path="/video-generation" element={<VideoGeneration />} />
+          <Route path="/auto-video-editor" element={<AutoVideoEditor />} />
+          <Route path="/ugc-ads" element={<UGCAdCreator />} />
+          <Route path="/product-ads" element={<ProductAdCreator />} />
+          <Route path="/avatar-studio" element={<AvatarStudio />} />
               <Route 
                 path="/analytics" 
                 element={
