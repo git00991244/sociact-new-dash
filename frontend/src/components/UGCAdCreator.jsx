@@ -1,431 +1,375 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import React, { useState } from 'react';
+import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Switch } from './ui/switch';
+import { 
+  Video, 
+  Play,
+  Sparkles,
+  Upload,
+  User,
+  Clock,
+  Target,
+  TrendingUp,
+  Zap,
+  ChevronDown,
+  Download,
+  Share2,
+  Settings
+} from 'lucide-react';
 
 const UGCAdCreator = () => {
-  const [productName, setProductName] = useState('');
-  const [productDescription, setProductDescription] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
-  const [adType, setAdType] = useState('testimonial');
-  const [avatarType, setAvatarType] = useState('millennial-female');
-  const [toneOfVoice, setToneOfVoice] = useState('authentic');
-  const [includeCallToAction, setIncludeCallToAction] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generateProgress, setGenerateProgress] = useState(0);
-  const [generatedAds, setGeneratedAds] = useState([]);
-  const [selectedAd, setSelectedAd] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState('testimonial');
+  const [productUrl, setProductUrl] = useState('');
+  const [adGoal, setAdGoal] = useState('brand-awareness');
+  const [targetAudience, setTargetAudience] = useState('');
 
-  const mockAds = [
+  const [generatedAds, setGeneratedAds] = useState([
     {
       id: 1,
-      title: 'Fitness App Testimonial',
-      product: 'FitLife Pro App',
-      thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      avatar: 'Millennial Female',
-      adType: 'Testimonial',
-      script: 'Hey guys! I just had to share this amazing fitness app I discovered...',
-      duration: '32s',
-      engagement: '94%',
-      ctr: '3.8%',
-      timestamp: '2 hours ago',
-      status: 'completed'
+      title: 'Skincare Product UGC Ad',
+      thumbnail: 'https://images.unsplash.com/photo-1720962158789-9389a4f399da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      duration: '0:30',
+      template: 'Testimonial',
+      performance: 'High CTR',
+      timestamp: '2 hours ago'
     },
     {
       id: 2,
-      title: 'Skincare Routine UGC',
-      product: 'GlowUp Serum',
-      thumbnail: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400',
-      avatar: 'Gen Z Female',
-      adType: 'Tutorial',
-      script: 'OMG, this skincare routine has completely transformed my skin...',
-      duration: '45s',
-      engagement: '89%',
-      ctr: '4.2%',
-      timestamp: '4 hours ago',
-      status: 'completed'
+      title: 'Tech Product Demo UGC',
+      thumbnail: 'https://images.unsplash.com/photo-1720962158858-5fb16991d2b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      duration: '0:45',
+      template: 'Unboxing',
+      performance: 'Viral Ready',
+      timestamp: '4 hours ago'
+    }
+  ]);
+
+  const adTemplates = [
+    {
+      id: 'testimonial',
+      name: 'Customer Testimonial',
+      description: 'Authentic customer reviews and experiences',
+      style: 'Conversational',
+      duration: '15-30s',
+      badge: 'Popular'
     },
     {
-      id: 3,
-      title: 'Tech Gadget Review',
-      product: 'SmartWatch Pro',
-      thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
-      avatar: 'Millennial Male',
-      adType: 'Review',
-      script: 'As someone who\'s always on the go, this smartwatch has been a game-changer...',
-      duration: '38s',
-      engagement: '91%',
-      ctr: '3.5%',
-      timestamp: '6 hours ago',
-      status: 'completed'
+      id: 'unboxing',
+      name: 'Unboxing Experience',
+      description: 'Product reveal and first impressions',
+      style: 'Exciting',
+      duration: '30-60s',
+      badge: 'Trending'
+    },
+    {
+      id: 'before-after',
+      name: 'Before & After',
+      description: 'Transformation stories and results',
+      style: 'Compelling',
+      duration: '20-40s',
+      badge: null
+    },
+    {
+      id: 'lifestyle',
+      name: 'Lifestyle Integration',
+      description: 'Product in daily life scenarios',
+      style: 'Natural',
+      duration: '30-45s',
+      badge: 'Hot'
     }
   ];
 
-  useEffect(() => {
-    if (isGenerating) {
-      const interval = setInterval(() => {
-        setGenerateProgress(prev => {
-          if (prev >= 100) {
-            setIsGenerating(false);
-            
-            const newAd = {
-              id: Date.now(),
-              title: `${productName} UGC Ad`,
-              product: productName,
-              thumbnail: mockAds[Math.floor(Math.random() * mockAds.length)].thumbnail,
-              avatar: avatarType,
-              adType: adType,
-              script: `Generated UGC script for ${productName}...`,
-              duration: '35s',
-              engagement: '0%',
-              ctr: '0%',
-              timestamp: 'just now',
-              status: 'completed'
-            };
-            
-            setGeneratedAds(prev => [newAd, ...prev]);
-            return 0;
-          }
-          return prev + Math.random() * 10;
-        });
-      }, 300);
-      return () => clearInterval(interval);
-    }
-  }, [isGenerating, productName, adType, avatarType]);
+  const adGoals = [
+    { value: 'brand-awareness', label: 'Brand Awareness', description: 'Increase visibility and recognition' },
+    { value: 'conversions', label: 'Drive Conversions', description: 'Generate sales and leads' },
+    { value: 'engagement', label: 'Boost Engagement', description: 'Increase likes, shares, comments' },
+    { value: 'app-installs', label: 'App Installs', description: 'Drive mobile app downloads' }
+  ];
 
-  const handleGenerate = () => {
-    if (!productName.trim() || !productDescription.trim()) {
-      alert('Please fill in product name and description');
-      return;
-    }
+  const generateAd = () => {
+    if (!productUrl.trim()) return;
+    
     setIsGenerating(true);
-    setGenerateProgress(0);
+    
+    setTimeout(() => {
+      const templates = ['Testimonial', 'Unboxing', 'Before & After', 'Lifestyle'];
+      const performances = ['High CTR', 'Viral Ready', 'Converting Well', 'Trending'];
+      
+      const newAd = {
+        id: Date.now(),
+        title: `Generated UGC Ad - ${productUrl.split('/')[2] || 'Product'}`,
+        thumbnail: 'https://images.unsplash.com/photo-1590417286292-4274afeee179?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxkaWdpdGFsJTIwd29ya3NwYWNlfGVufDB8fHx8MTc1MzAxMDM1MHww&ixlib=rb-4.1.0&q=85',
+        duration: '0:35',
+        template: templates[Math.floor(Math.random() * templates.length)],
+        performance: performances[Math.floor(Math.random() * performances.length)],
+        timestamp: 'Just now'
+      };
+      
+      setGeneratedAds(prev => [newAd, ...prev]);
+      setIsGenerating(false);
+      setProductUrl('');
+    }, 6000);
   };
 
-  const adTypes = [
-    { value: 'testimonial', label: 'Customer Testimonial' },
-    { value: 'review', label: 'Product Review' },
-    { value: 'tutorial', label: 'How-to/Tutorial' },
-    { value: 'unboxing', label: 'Unboxing Experience' },
-    { value: 'comparison', label: 'Product Comparison' },
-    { value: 'lifestyle', label: 'Lifestyle Integration' }
-  ];
-
-  const avatarTypes = [
-    { value: 'millennial-female', label: 'Millennial Female' },
-    { value: 'millennial-male', label: 'Millennial Male' },
-    { value: 'genz-female', label: 'Gen Z Female' },
-    { value: 'genz-male', label: 'Gen Z Male' },
-    { value: 'professional-female', label: 'Professional Female' },
-    { value: 'professional-male', label: 'Professional Male' }
-  ];
-
-  const toneOptions = [
-    { value: 'authentic', label: 'Authentic & Real' },
-    { value: 'enthusiastic', label: 'Enthusiastic' },
-    { value: 'casual', label: 'Casual & Friendly' },
-    { value: 'expert', label: 'Expert/Authority' },
-    { value: 'relatable', label: 'Relatable' }
-  ];
-
-  const allAds = [...generatedAds, ...mockAds];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-8 py-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">UGC Ad Creator</h1>
+            <p className="text-slate-400">Create authentic user-generated content ads that convert</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+              <Zap className="h-3 w-3 mr-1" />
+              Credits: 1,247
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-8">
+        {/* Featured Products Section */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl flex items-center justify-center text-2xl">
-              🎭
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">UGC Ad Creator</h1>
-              <p className="text-slate-400">Create authentic user-generated content ads with custom avatars</p>
-            </div>
-            <div className="ml-auto flex gap-2">
-              <Badge variant="secondary" className="bg-pink-500/20 text-pink-400">
-                🟢 Avatar Studio Ready
-              </Badge>
-              <Badge variant="secondary">
-                {generatedAds.length + mockAds.length} Ads Created
-              </Badge>
-            </div>
+          <h2 className="text-2xl font-bold text-white mb-6">Featured Ad Types</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {adTemplates.map((template) => (
+              <Card 
+                key={template.id}
+                className={`p-6 cursor-pointer transition-all duration-200 ${
+                  selectedTemplate === template.id
+                    ? 'bg-blue-600/20 border-blue-500/50 ring-2 ring-blue-500/30'
+                    : 'bg-slate-800/50 border-slate-700 hover:bg-slate-800/70'
+                }`}
+                onClick={() => setSelectedTemplate(template.id)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                    <Video className="h-6 w-6 text-white" />
+                  </div>
+                  {template.badge && (
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs">
+                      {template.badge}
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">{template.name}</h3>
+                <p className="text-sm text-slate-400 mb-3">{template.description}</p>
+                <div className="flex items-center justify-between text-xs text-slate-500">
+                  <span>{template.style}</span>
+                  <span>{template.duration}</span>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Creation Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span>🎬</span>
-                  Create UGC Ad
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Product Name</label>
-                  <Input
-                    placeholder="Enter your product name..."
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white"
+        <div className="grid grid-cols-12 gap-8">
+          {/* Left Panel - Creation Form */}
+          <div className="col-span-4">
+            <div className="space-y-6">
+              {/* Product URL Input */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Product URL</label>
+                <div className="space-y-3">
+                  <input
+                    type="url"
+                    value={productUrl}
+                    onChange={(e) => setProductUrl(e.target.value)}
+                    placeholder="https://your-product-url.com"
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
                   />
+                  <p className="text-xs text-slate-400">We'll analyze your product page to create targeted UGC ads</p>
                 </div>
+              </Card>
 
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Product Description</label>
-                  <Textarea
-                    placeholder="Describe your product and its key benefits..."
-                    value={productDescription}
-                    onChange={(e) => setProductDescription(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
-                  />
+              {/* Upload Visual Assets */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Visual Assets (Optional)</label>
+                <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors">
+                  <Upload className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-300 font-medium mb-1">Upload product images or videos</p>
+                  <p className="text-sm text-slate-500">PNG, JPG, MP4 up to 50MB</p>
                 </div>
+              </Card>
 
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Target Audience</label>
-                  <Input
-                    placeholder="e.g., Young professionals, fitness enthusiasts..."
-                    value={targetAudience}
-                    onChange={(e) => setTargetAudience(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
+              {/* Ad Goal Selection */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Campaign Goal</label>
+                <div className="relative">
+                  <select 
+                    value={adGoal}
+                    onChange={(e) => setAdGoal(e.target.value)}
+                    className="w-full appearance-none bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  >
+                    {adGoals.map((goal) => (
+                      <option key={goal.value} value={goal.value}>
+                        {goal.label} - {goal.description}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 </div>
+              </Card>
 
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Ad Type</label>
-                  <Select value={adType} onValueChange={setAdType}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {adTypes.map(type => (
-                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* Target Audience */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Target Audience</label>
+                <textarea
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value)}
+                  placeholder="Describe your ideal customer (age, interests, demographics, pain points...)"
+                  className="w-full h-24 px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                />
+              </Card>
+
+              {/* Advanced Settings */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-white">Advanced Settings</h4>
+                  <Settings className="h-4 w-4 text-slate-400" />
                 </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Avatar Type</label>
-                  <Select value={avatarType} onValueChange={setAvatarType}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {avatarTypes.map(avatar => (
-                        <SelectItem key={avatar.value} value={avatar.value}>{avatar.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Tone of Voice</label>
-                  <Select value={toneOfVoice} onValueChange={setToneOfVoice}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {toneOptions.map(tone => (
-                        <SelectItem key={tone.value} value={tone.value}>{tone.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-slate-300">Include Call-to-Action</label>
-                    <p className="text-xs text-slate-400">Add CTA at the end of the ad</p>
+                    <label className="block text-sm text-slate-300 mb-2">Video Duration</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="15">15 seconds</option>
+                      <option value="30">30 seconds</option>
+                      <option value="60">60 seconds</option>
+                    </select>
                   </div>
-                  <Switch
-                    checked={includeCallToAction}
-                    onCheckedChange={setIncludeCallToAction}
-                  />
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Aspect Ratio</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="9:16">9:16 (TikTok/Instagram)</option>
+                      <option value="1:1">1:1 (Instagram Square)</option>
+                      <option value="16:9">16:9 (YouTube)</option>
+                    </select>
+                  </div>
                 </div>
+              </Card>
 
-                {isGenerating && (
-                  <div className="p-4 bg-pink-500/10 border border-pink-500/30 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-pink-400 font-medium">Creating UGC Ad...</span>
-                      <span className="text-pink-400">{Math.round(generateProgress)}%</span>
-                    </div>
-                    <Progress value={generateProgress} className="h-2" />
-                    <p className="text-sm text-slate-400 mt-2">
-                      {generateProgress < 30 ? 'Analyzing product...' : 
-                       generateProgress < 60 ? 'Creating avatar...' :
-                       generateProgress < 90 ? 'Writing UGC script...' : 'Generating video...'}
-                    </p>
-                  </div>
-                )}
-
+              {/* Generate Button */}
+              <div className="pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-white">Credits required:</span>
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">50 Credits</Badge>
+                </div>
                 <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !productName.trim() || !productDescription.trim()}
-                  className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500"
+                  onClick={generateAd}
+                  disabled={isGenerating || !productUrl.trim()}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3"
                 >
                   {isGenerating ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white/20 border-t-white rounded-full mr-2"></div>
-                      Creating...
-                    </>
+                    <div className="flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                      Creating UGC Ad...
+                    </div>
                   ) : (
-                    <>🎭 Create UGC Ad</>
+                    <div className="flex items-center justify-center">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Create UGC Ad
+                    </div>
                   )}
                 </Button>
-              </CardContent>
-            </Card>
 
-            {/* UGC Tips */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">💡 UGC Best Practices</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-slate-300 space-y-2">
-                <p>• Keep it authentic and conversational</p>
-                <p>• Show real product benefits</p>
-                <p>• Use relatable scenarios</p>
-                <p>• Include social proof elements</p>
-                <p>• Add clear call-to-actions</p>
-                <p>• Optimize for mobile viewing</p>
-              </CardContent>
-            </Card>
+                {isGenerating && (
+                  <div className="mt-4">
+                    <Progress value={72} className="h-2 bg-slate-700" />
+                    <p className="text-xs text-slate-400 mt-2 text-center">Analyzing product and generating authentic UGC...</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Ad Gallery */}
-          <div className="lg:col-span-3 space-y-6">
-            {selectedAd && (
-              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-6">
-                    <div className="relative">
-                      <img
-                        src={selectedAd.thumbnail}
-                        alt={selectedAd.title}
-                        className="w-80 h-48 object-cover rounded-lg"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
-                        <Button size="lg" className="bg-white/90 text-black hover:bg-white">
-                          ▶️ Play UGC Ad
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">{selectedAd.title}</h3>
-                      <p className="text-slate-300 mb-4">{selectedAd.product}</p>
-                      <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">Duration</p>
-                          <p className="text-lg font-semibold">{selectedAd.duration}</p>
-                        </div>
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">Engagement</p>
-                          <p className="text-lg font-semibold text-green-400">{selectedAd.engagement}</p>
-                        </div>
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">CTR</p>
-                          <p className="text-lg font-semibold text-blue-400">{selectedAd.ctr}</p>
-                        </div>
-                      </div>
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-slate-300 mb-2">Script Preview:</p>
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-200">{selectedAd.script}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <Button size="sm" className="bg-pink-600 hover:bg-pink-500">
-                          📥 Download Ad
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          ✏️ Edit Script
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          🔄 Generate Variant
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          📊 Performance
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedAd(null)}
-                        >
-                          ✕ Close
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          {/* Right Panel - Generated Ads */}
+          <div className="col-span-8">
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Your UGC Ads</h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="border-slate-600 text-slate-300">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    {generatedAds.length} Ads Created
+                  </Badge>
+                </div>
+              </div>
+            </div>
 
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>UGC Ad Gallery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {allAds.map((ad) => (
-                    <div
-                      key={ad.id}
-                      className="group relative bg-slate-700/30 rounded-lg overflow-hidden hover:bg-slate-700/50 transition-all duration-200 cursor-pointer"
-                      onClick={() => setSelectedAd(ad)}
-                    >
+            {generatedAds.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Video className="h-10 w-10 text-slate-400" />
+                </div>
+                <p className="text-slate-400 text-lg mb-2">No UGC ads created yet</p>
+                <p className="text-slate-500 text-sm">Add your product URL to start creating authentic user-generated content ads</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
+                {generatedAds.map((ad) => (
+                  <div key={ad.id} className="group">
+                    <Card className="overflow-hidden bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all">
                       <div className="relative">
-                        <img
-                          src={ad.thumbnail}
+                        <img 
+                          src={ad.thumbnail} 
                           alt={ad.title}
-                          className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-full aspect-video object-cover"
                         />
                         
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <Button
-                            size="sm"
-                            className="bg-white/90 text-black hover:bg-white"
-                          >
-                            ▶️ Preview
+                        {/* Play Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button size="lg" className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm">
+                            <Play className="h-6 w-6" />
                           </Button>
                         </div>
 
-                        <div className="absolute top-2 right-2 space-y-1">
-                          <Badge variant="secondary" className="text-xs block">
-                            {ad.duration}
+                        {/* Performance Badge */}
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-green-500/80 text-white text-xs">
+                            {ad.performance}
                           </Badge>
                         </div>
+
+                        {/* Duration */}
+                        <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-xs text-white">
+                          {ad.duration}
+                        </div>
                       </div>
-                      
+
                       <div className="p-4">
-                        <h3 className="font-medium text-white truncate mb-1">{ad.title}</h3>
-                        <p className="text-sm text-slate-400 truncate mb-2">{ad.product}</p>
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline" className="text-xs">{ad.adType}</Badge>
-                          <span className="text-xs text-slate-500">{ad.timestamp}</span>
+                        <h4 className="font-medium text-white mb-2 line-clamp-2">{ad.title}</h4>
+                        <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                          <span>Template: {ad.template}</span>
+                          <span>{ad.timestamp}</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <div className="flex gap-2">
-                            <span>💚 {ad.engagement}</span>
-                            <span>👆 {ad.ctr}</span>
-                          </div>
-                          {ad.timestamp === 'just now' && (
-                            <Badge variant="default" className="bg-pink-500 text-xs">New</Badge>
-                          )}
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" className="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 hover:bg-blue-600/30">
+                            <Download className="h-3 w-3 mr-1" />
+                            Download
+                          </Button>
+                          <Button size="sm" variant="ghost" className="px-2">
+                            <Share2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {generatedAds.length > 0 && (
+              <div className="text-center mt-8">
+                <Button variant="outline" className="border-slate-600">
+                  Load More Ads
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
