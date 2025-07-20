@@ -262,47 +262,7 @@ export const activityFeed = mockData.recentActivities;
 export const quickActions = mockData.quickActions.map((action, index) => ({ id: index, ...action }));
 export const todaysStats = mockData.stats.map(stat => ({ icon: stat.icon === 'video' ? '🎥' : stat.icon === 'image' ? '🖼️' : stat.icon === 'comment' ? '💬' : '✂️', label: stat.label, value: stat.value }));
 
-export const dashboardStats = [
-  { label: 'Comments Automated', value: '1,247', change: '+12%' },
-  { label: 'Images Generated', value: '89', change: '+5%' },
-  { label: 'Videos Created', value: '23', change: '+8%' },
-  { label: 'Ad Campaigns', value: '15', change: '+3%' },
-  { label: 'Avg Rating', value: '4.8', change: '+0.2' }
-];
 
-export const sidebarItems = [
-  {
-    section: 'DASHBOARD',
-    items: [
-      { label: 'Overview', icon: '📊', path: '/dashboard' },
-      { label: 'Analytics', icon: '📈', path: '/analytics' }
-    ]
-  },
-  {
-    section: 'AI TOOLS',
-    items: [
-      { label: 'Comment Automation', icon: '💬', path: '/comment-automation', badge: 'NEW' },
-      { label: 'Image Generation', icon: '🖼️', path: '/image-generation' },
-      { label: 'Video Generation', icon: '🎬', path: '/video-generation' },
-      { label: 'Auto Video Editor', icon: '✂️', path: '/auto-video-editor' }
-    ]
-  },
-  {
-    section: 'AD CREATION',
-    items: [
-      { label: 'UGC Ads Creator', icon: '🎭', path: '/ugc-ads' },
-      { label: 'Product Ads Creator', icon: '📦', path: '/product-ads' },
-      { label: 'Avatar Studio', icon: '👤', path: '/avatar-studio' }
-    ]
-  },
-  {
-    section: 'ACCOUNT',
-    items: [
-      { label: 'Settings', icon: '⚙️', path: '/settings' },
-      { label: 'Help & Support', icon: '❓', path: '/support' }
-    ]
-  }
-];
 
 export const commandOptions = {
   actions: [
