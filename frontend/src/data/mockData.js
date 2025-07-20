@@ -306,26 +306,23 @@ export const sidebarItems = [
 
 export const commandOptions = {
   actions: [
-    'Generate Video',
-    'Create Image',
-    'Write Script',
-    'Auto Comments',
-    'Edit Video',
-    'Schedule Content',
-    'Optimize SEO'
+    'Generate video',
+    'Create image',
+    'Auto-reply to comments',
+    'Edit video',
+    'Write script',
+    'Optimize SEO',
+    'Schedule content',
+    'Create UGC ad'
   ],
   targets: [
-    'Instagram Posts',
-    'YouTube Videos',
-    'TikTok Content',
-    'Facebook Ads',
-    'Product Campaigns'
-  ],
-  timeframes: [
-    'Now',
-    'In 1 hour',
-    'Tomorrow',
-    'This week',
-    'Custom schedule'
+    'Instagram Reels',
+    'YouTube Shorts',
+    'TikTok videos',
+    'Product thumbnails',
+    'Story templates',
+    'Ad creatives',
+    'YouTube comments',
+    'Instagram posts'
   ]
 };
