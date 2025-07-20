@@ -17,15 +17,18 @@ import {
   FileVideo,
   Sparkles,
   RotateCcw,
-  Share2
+  Share2,
+  ChevronDown,
+  Zap
 } from 'lucide-react';
 
 const VideoGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeTab, setActiveTab] = useState('script');
   const [script, setScript] = useState('');
+  const [selectedModel, setSelectedModel] = useState('google-veo-2');
   const [selectedAvatar, setSelectedAvatar] = useState('professional');
   const [selectedVoice, setSelectedVoice] = useState('sarah');
+  const [duration, setDuration] = useState('60');
   
   const [generatedVideos, setGeneratedVideos] = useState([
     {
@@ -52,6 +55,33 @@ const VideoGeneration = () => {
     }
   ]);
 
+  const models = [
+    {
+      id: 'google-veo-2',
+      name: 'Google Veo 2',
+      description: 'HD outputs with visually rich content',
+      time: '5 min',
+      credits: '20+',
+      badge: 'Hot'
+    },
+    {
+      id: 'kling-2',
+      name: 'Kling 2.0',
+      description: 'Better motion dynamics and aesthetics',
+      time: '8 min',
+      credits: '100+',
+      badge: null
+    },
+    {
+      id: 'pixverse-v4',
+      name: 'Pixverse V4',
+      description: 'Improved motion and coherence',
+      time: '60 sec',
+      credits: '10+',
+      badge: null
+    }
+  ];
+
   const avatars = [
     { id: 'professional', name: 'Professional', description: 'Business suit, formal look' },
     { id: 'casual', name: 'Casual', description: 'Friendly, approachable style' },
@@ -71,7 +101,6 @@ const VideoGeneration = () => {
     
     setIsGenerating(true);
     
-    // Simulate video generation process
     setTimeout(() => {
       const newVideo = {
         id: Date.now(),
@@ -91,278 +120,265 @@ const VideoGeneration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      <div className="p-8 space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-8 py-6">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-              <Video className="h-8 w-8 mr-3 text-blue-400" />
-              Video Generation
-            </h1>
-            <p className="text-slate-400">Generate professional videos with AI avatars and automated editing</p>
+            <h1 className="text-3xl font-bold text-white mb-2">AI Video Generation</h1>
+            <p className="text-slate-400">Turn scripts into professional videos with AI avatars</p>
           </div>
-          <Badge variant="outline" className="border-blue-400 text-blue-400 animate-pulse">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
-            Active
-          </Badge>
+          <div className="flex items-center gap-4">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+              <Zap className="h-3 w-3 mr-1" />
+              Credits: 1,247
+            </Badge>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Creation Panel */}
-          <div className="col-span-4 space-y-6">
-            <Card className="p-6 bg-slate-800/50 border-slate-700">
-              <h3 className="text-xl font-semibold text-white mb-4">Create Video</h3>
-              
-              {/* Tab Navigation */}
-              <div className="flex space-x-1 bg-slate-700/50 p-1 rounded-lg mb-4">
-                <button
-                  onClick={() => setActiveTab('script')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                    activeTab === 'script' 
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Script
-                </button>
-                <button
-                  onClick={() => setActiveTab('avatar')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                    activeTab === 'avatar' 
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Avatar
-                </button>
-                <button
-                  onClick={() => setActiveTab('voice')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                    activeTab === 'voice' 
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Voice
-                </button>
-              </div>
-
-              {/* Script Tab */}
-              {activeTab === 'script' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Video Script
-                    </label>
-                    <textarea
-                      value={script}
-                      onChange={(e) => setScript(e.target.value)}
-                      placeholder="Write your video script here... Hi everyone! Welcome to my channel where I share amazing tips about social media automation..."
-                      className="w-full h-32 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
-                    />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                      <span>{script.length} characters</span>
-                      <span>~{Math.ceil(script.length / 100)} seconds</span>
-                    </div>
+      <div className="p-8">
+        <div className="grid grid-cols-12 gap-8">
+          {/* Left Panel - Controls */}
+          <div className="col-span-4">
+            <div className="space-y-6">
+              {/* Model Selection */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-white mb-3">Model</label>
+                  <div className="relative">
+                    <select 
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="w-full appearance-none bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                    >
+                      {models.map((model) => (
+                        <option key={model.id} value={model.id}>
+                          {model.name} - {model.description}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                   </div>
-                  <Button variant="outline" size="sm" className="w-full border-slate-600">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate Script with AI
-                  </Button>
-                </div>
-              )}
-
-              {/* Avatar Tab */}
-              {activeTab === 'avatar' && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Choose Avatar
-                  </label>
-                  {avatars.map((avatar) => (
-                    <div
-                      key={avatar.id}
-                      onClick={() => setSelectedAvatar(avatar.id)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedAvatar === avatar.id
-                          ? 'bg-blue-500/20 border border-blue-500/30'
-                          : 'bg-slate-700/50 hover:bg-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <User className="h-5 w-5 text-blue-400" />
-                        <div>
-                          <p className="font-medium text-white">{avatar.name}</p>
-                          <p className="text-xs text-slate-400">{avatar.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Voice Tab */}
-              {activeTab === 'voice' && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Select Voice
-                  </label>
-                  {voices.map((voice) => (
-                    <div
-                      key={voice.id}
-                      onClick={() => setSelectedVoice(voice.id)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedVoice === voice.id
-                          ? 'bg-blue-500/20 border border-blue-500/30'
-                          : 'bg-slate-700/50 hover:bg-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <Volume2 className="h-5 w-5 text-blue-400" />
+                  
+                  {/* Model Info */}
+                  <div className="mt-3 p-3 bg-slate-700/30 rounded-lg">
+                    {(() => {
+                      const model = models.find(m => m.id === selectedModel);
+                      return (
+                        <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-white">{voice.name}</p>
-                            <p className="text-xs text-slate-400">{voice.description}</p>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white">{model?.name}</span>
+                              {model?.badge && (
+                                <Badge variant="secondary" className="text-xs bg-red-500/20 text-red-400">
+                                  {model.badge}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-400 mt-1">{model?.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-slate-300">{model?.time}</p>
+                            <p className="text-xs text-slate-400">{model?.credits} credits</p>
                           </div>
                         </div>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Play className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Generate Button */}
-              <div className="mt-6 space-y-4">
-                <Button
-                  onClick={generateVideo}
-                  disabled={isGenerating || !script.trim()}
-                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
-                >
-                  {isGenerating ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                      Generating Video...
-                    </>
-                  ) : (
-                    <>
-                      <Video className="h-4 w-4 mr-2" />
-                      Generate Video
-                    </>
-                  )}
-                </Button>
-
-                {isGenerating && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Creating video...</span>
-                      <span className="text-white">45%</span>
-                    </div>
-                    <Progress value={45} className="h-2 bg-slate-700">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 rounded-full" style={{ width: '45%' }}></div>
-                    </Progress>
-                    <p className="text-xs text-slate-400">Processing avatar animations...</p>
+                      );
+                    })()}
                   </div>
-                )}
-              </div>
-            </Card>
+                </div>
+              </Card>
 
-            {/* Quick Settings */}
-            <Card className="p-4 bg-slate-800/50 border-slate-700">
-              <h4 className="font-semibold text-white mb-3 flex items-center">
-                <Settings className="h-4 w-4 mr-2" />
-                Video Settings
-              </h4>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">Video Quality</label>
-                  <select className="w-full px-2 py-1 bg-slate-700/50 border border-slate-600 rounded text-white text-sm">
-                    <option>4K Ultra HD</option>
-                    <option>1080p HD</option>
-                    <option>720p</option>
-                  </select>
+              {/* Video Upload Area */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Reference Video (Optional)</label>
+                <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-slate-500 transition-colors">
+                  <Video className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-300 font-medium mb-1">Click to upload a reference</p>
+                  <p className="text-sm text-slate-500">MP4, MOV up to 100MB</p>
                 </div>
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">Format</label>
-                  <select className="w-full px-2 py-1 bg-slate-700/50 border border-slate-600 rounded text-white text-sm">
-                    <option>MP4</option>
-                    <option>MOV</option>
-                    <option>AVI</option>
-                  </select>
+              </Card>
+
+              {/* Script Input */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Script</label>
+                <textarea
+                  value={script}
+                  onChange={(e) => setScript(e.target.value)}
+                  placeholder="Write your video script here... Hi everyone! Welcome to my channel where I share amazing tips about social media automation..."
+                  className="w-full h-32 px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs text-slate-500">{script.length} characters (~{Math.ceil(script.length / 100)} seconds)</span>
+                  <Button variant="outline" size="sm" className="border-slate-600 text-slate-300">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    AI Enhance
+                  </Button>
                 </div>
-              </div>
-            </Card>
+              </Card>
+
+              {/* Settings */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-white mb-2">Avatar</label>
+                    <select 
+                      value={selectedAvatar}
+                      onChange={(e) => setSelectedAvatar(e.target.value)}
+                      className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400"
+                    >
+                      {avatars.map(avatar => (
+                        <option key={avatar.id} value={avatar.id}>{avatar.name} - {avatar.description}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-white mb-2">Voice</label>
+                    <select 
+                      value={selectedVoice}
+                      onChange={(e) => setSelectedVoice(e.target.value)}
+                      className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400"
+                    >
+                      {voices.map(voice => (
+                        <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-white mb-2">Duration</label>
+                    <select 
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400"
+                    >
+                      <option value="15">15 seconds</option>
+                      <option value="30">30 seconds</option>
+                      <option value="60">1 minute</option>
+                      <option value="120">2 minutes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-white mb-2">Quality</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="4k">4K Ultra HD</option>
+                      <option value="1080p">1080p HD</option>
+                      <option value="720p">720p</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-slate-600">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-white">Credits required:</span>
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      {models.find(m => m.id === selectedModel)?.credits || '20+'} Credits
+                    </Badge>
+                  </div>
+                  <Button
+                    onClick={generateVideo}
+                    disabled={isGenerating || !script.trim()}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3"
+                  >
+                    {isGenerating ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                        Generating Video...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <Video className="h-4 w-4 mr-2" />
+                        Generate Video
+                      </div>
+                    )}
+                  </Button>
+
+                  {isGenerating && (
+                    <div className="mt-4">
+                      <Progress value={45} className="h-2 bg-slate-700" />
+                      <p className="text-xs text-slate-400 mt-2 text-center">Processing avatar animations...</p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </div>
           </div>
 
-          {/* Video Gallery */}
+          {/* Right Panel - Generated Videos */}
           <div className="col-span-8">
-            <Card className="p-6 bg-slate-800/50 border-slate-700">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-white">Generated Videos</h3>
-                <div className="flex items-center space-x-2">
-                  <Button size="sm" variant="outline" className="border-slate-600">
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Generated Videos</h2>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="border-slate-600">
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Refresh
                   </Button>
-                  <Button size="sm" variant="outline" className="border-slate-600">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Video
-                  </Button>
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
+            {generatedVideos.length === 0 ? (
+              <div className="text-center py-16">
+                <Video className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 text-lg">No videos generated yet</p>
+                <p className="text-slate-500 text-sm">Create your first video using the panel on the left</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
                 {generatedVideos.map((video) => (
-                  <div key={video.id} className="group relative bg-slate-700/30 rounded-lg overflow-hidden">
-                    {/* Video Thumbnail */}
-                    <div className="relative">
-                      <img 
-                        src={video.thumbnail} 
-                        alt={video.title}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="lg" className="rounded-full bg-white/20 hover:bg-white/30">
-                          <Play className="h-6 w-6" />
-                        </Button>
-                      </div>
-                      <div className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white">
-                        {video.duration}
-                      </div>
-                    </div>
-
-                    {/* Video Info */}
-                    <div className="p-4">
-                      <h4 className="font-medium text-white mb-2 truncate">{video.title}</h4>
-                      <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
-                        <span>Avatar: {video.avatar}</span>
-                        <span>Voice: {video.voice}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-500">{video.timestamp}</span>
-                        <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-                            <Download className="h-3 w-3" />
-                          </Button>
-                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-                            <Share2 className="h-3 w-3" />
+                  <div key={video.id} className="group relative">
+                    <Card className="overflow-hidden bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all">
+                      <div className="relative">
+                        <img 
+                          src={video.thumbnail} 
+                          alt={video.title}
+                          className="w-full aspect-video object-cover"
+                        />
+                        
+                        {/* Play Button */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button size="lg" className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm">
+                            <Play className="h-6 w-6" />
                           </Button>
                         </div>
+
+                        {/* Duration Badge */}
+                        <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-xs text-white">
+                          {video.duration}
+                        </div>
                       </div>
-                    </div>
+
+                      <div className="p-4">
+                        <h4 className="font-medium text-white mb-2 line-clamp-2">{video.title}</h4>
+                        <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                          <span>Avatar: {video.avatar}</span>
+                          <span>Voice: {video.voice}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-slate-500">{video.timestamp}</span>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                              <Download className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                              <Share2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
                 ))}
               </div>
+            )}
 
-              {/* Load More */}
-              <div className="text-center mt-6">
+            {generatedVideos.length > 0 && (
+              <div className="text-center mt-8">
                 <Button variant="outline" className="border-slate-600">
                   Load More Videos
                 </Button>
               </div>
-            </Card>
+            )}
           </div>
         </div>
       </div>
