@@ -1,370 +1,366 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { agentStatus, activityFeed, quickActions, todaysStats, commandOptions } from '../data/mockData';
+import { 
+  Bot, 
+  Video, 
+  Image as ImageIcon, 
+  MessageCircle, 
+  Edit3, 
+  Calendar, 
+  BarChart3, 
+  Search,
+  Sparkles,
+  Play,
+  Pause,
+  Settings,
+  Upload,
+  Download,
+  LayoutDashboard,
+  PieChart,
+  Wand2,
+  User,
+  Plus
+} from 'lucide-react';
+import mockData from '../data/mockData';
 
-const Dashboard = () => {
-  const [agents, setAgents] = useState(agentStatus);
-  const [activities, setActivities] = useState(activityFeed);
-  const [selectedAction, setSelectedAction] = useState('');
-  const [selectedTarget, setSelectedTarget] = useState('');
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [executionProgress, setExecutionProgress] = useState(0);
-  const [activeQuickAction, setActiveQuickAction] = useState(null);
+const Dashboard = ({ activePage, setActivePage }) => {
+  const [agents, setAgents] = useState(mockData.agents);
+  const [activities, setActivities] = useState(mockData.recentActivities);
+  const [searchInput, setSearchInput] = useState('');
 
-  // Simulate live updates
+  // Simulate real-time activity updates
   useEffect(() => {
     const interval = setInterval(() => {
-      // Update agent progress randomly
-      setAgents(prev => {
-        const newAgents = { ...prev };
-        Object.keys(newAgents).forEach(key => {
-          if (newAgents[key].status === 'active' || newAgents[key].status === 'processing') {
-            const currentProgress = newAgents[key].progress;
-            const increment = Math.random() * 5;
-            newAgents[key].progress = Math.min(100, currentProgress + increment);
-            
-            if (newAgents[key].progress >= 100) {
-              newAgents[key].status = 'idle';
-              newAgents[key].progress = 0;
-              setTimeout(() => {
-                setAgents(current => ({
-                  ...current,
-                  [key]: {
-                    ...current[key],
-                    status: Math.random() > 0.5 ? 'active' : 'processing',
-                    progress: Math.random() * 30
-                  }
-                }));
-              }, 2000);
-            }
-          }
-        });
-        return newAgents;
-      });
-
-      // Add new activity occasionally
-      if (Math.random() > 0.7) {
-        const newActivities = [
-          'generated new avatar video',
-          'completed image optimization',
-          'replied to 5 comments',
-          'created product thumbnail',
-          'optimized SEO content',
-          'scheduled Instagram post'
-        ];
-        
-        const agents = ['Video Agent', 'Image Agent', 'Comment Agent', 'SEO Agent', 'Editor Agent'];
-        const icons = ['🎬', '🖼️', '💬', '🔍', '✂️'];
-        const colors = ['purple', 'green', 'orange', 'blue', 'red'];
-        
-        const randomIndex = Math.floor(Math.random() * newActivities.length);
-        const agentIndex = Math.floor(Math.random() * agents.length);
-        
-        setActivities(prev => [
-          {
-            id: Date.now(),
-            agent: agents[agentIndex],
-            action: newActivities[randomIndex],
-            timestamp: 'just now',
-            icon: icons[agentIndex],
-            color: colors[agentIndex]
-          },
-          ...prev.slice(0, 9)
-        ]);
-      }
-    }, 3000);
+      const newActivity = mockData.generateRandomActivity();
+      setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const executeCommand = async () => {
-    if (!selectedAction || !selectedTarget) return;
-    
-    setIsExecuting(true);
-    setExecutionProgress(0);
-    
-    // Simulate execution progress
-    const progressInterval = setInterval(() => {
-      setExecutionProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          setIsExecuting(false);
-          
-          // Add success activity
-          setActivities(prev => [
-            {
-              id: Date.now(),
-              agent: 'Command Agent',
-              action: `executed: ${selectedAction} for ${selectedTarget}`,
-              timestamp: 'just now',
-              icon: '⚡',
-              color: 'yellow'
-            },
-            ...prev.slice(0, 9)
-          ]);
-          
-          setSelectedAction('');
-          setSelectedTarget('');
-          return 0;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 200);
-  };
+  const sidebarSections = [
+    {
+      title: 'DASHBOARD',
+      items: [
+        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+        { id: 'analytics', label: 'Analytics', icon: PieChart }
+      ]
+    },
+    {
+      title: 'AI TOOLS',
+      items: [
+        { id: 'comment-automation', label: 'Comment Automation', icon: MessageCircle, badge: 'NEW' },
+        { id: 'image-generation', label: 'Image Generation', icon: ImageIcon },
+        { id: 'video-generation', label: 'Video Generation', icon: Video },
+        { id: 'auto-video-editor', label: 'Auto Video Editor', icon: Edit3 }
+      ]
+    },
+    {
+      title: 'AD CREATION',
+      items: [
+        { id: 'ugc-ads', label: 'UGC Ads Creator', icon: Wand2 },
+        { id: 'product-ads', label: 'Product Ads Creator', icon: Sparkles },
+        { id: 'avatar-studio', label: 'Avatar Studio', icon: User }
+      ]
+    },
+    {
+      title: 'ACCOUNT',
+      items: [
+        { id: 'settings', label: 'Settings', icon: Settings }
+      ]
+    }
+  ];
 
-  const handleQuickAction = async (actionId) => {
-    setActiveQuickAction(actionId);
-    
-    // Simulate action execution
-    setTimeout(() => {
-      const action = quickActions.find(a => a.id === actionId);
-      setActivities(prev => [
-        {
-          id: Date.now(),
-          agent: 'Quick Action',
-          action: `executed: ${action.label}`,
-          timestamp: 'just now',
-          icon: action.icon,
-          color: action.color
-        },
-        ...prev.slice(0, 9)
-      ]);
-      setActiveQuickAction(null);
-    }, 2000);
-  };
+  const mainFeatures = [
+    {
+      id: 'comment-automation',
+      title: 'Comment Automation',
+      description: 'Automate engaging comments on YouTube and Instagram with AI-powered responses',
+      icon: MessageCircle,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-500/20',
+      status: 'Active',
+      statusColor: 'bg-green-500'
+    },
+    {
+      id: 'image-generation',
+      title: 'AI Image Generation',
+      description: 'Create stunning visuals and graphics for your social media campaigns',
+      icon: ImageIcon,
+      color: 'from-pink-500 to-red-500',
+      bgColor: 'bg-pink-500/20',
+      status: 'Processing',
+      statusColor: 'bg-blue-500'
+    },
+    {
+      id: 'video-generation',
+      title: 'Video Generation',
+      description: 'Generate professional videos with AI avatars and automated editing',
+      icon: Video,
+      color: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-blue-500/20',
+      status: 'Active',
+      statusColor: 'bg-green-500'
+    },
+    {
+      id: 'ugc-ads',
+      title: 'UGC Ad Creator',
+      description: 'Create authentic user-generated content ads with custom avatars',
+      icon: Wand2,
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-green-500/20',
+      status: 'Generating',
+      statusColor: 'bg-purple-500'
+    }
+  ];
 
-  const getStatusColor = (status) => {
-    const colors = {
-      active: 'text-green-400',
-      processing: 'text-blue-400',
-      generating: 'text-purple-400',
-      idle: 'text-gray-400'
+  const getAgentStatus = (status) => {
+    const statusMap = {
+      'Active': { color: 'bg-green-500', text: 'Active', icon: '🟢' },
+      'Processing': { color: 'bg-blue-500', text: 'Processing', icon: '🔄' },
+      'Generating': { color: 'bg-purple-500', text: 'Generating', icon: '⚡' },
+      'Idle': { color: 'bg-gray-400', text: 'Idle', icon: '⚫' }
     };
-    return colors[status] || 'text-gray-400';
+    return statusMap[status] || statusMap.Idle;
   };
 
-  const getStatusDot = (status) => {
-    const colors = {
-      active: 'bg-green-400',
-      processing: 'bg-blue-400', 
-      generating: 'bg-purple-400',
-      idle: 'bg-gray-400'
-    };
-    return colors[status] || 'bg-gray-400';
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      // Process natural language commands
+      const command = searchInput.toLowerCase();
+      let response = '';
+      let targetPage = null;
+
+      if (command.includes('generate') && (command.includes('reel') || command.includes('video'))) {
+        response = `🎬 Processing: "${searchInput}" - Redirecting to Video Generation...`;
+        targetPage = 'video-generation';
+      } else if (command.includes('create') && (command.includes('image') || command.includes('thumbnail'))) {
+        response = `🖼️ Processing: "${searchInput}" - Redirecting to Image Generation...`;
+        targetPage = 'image-generation';
+      } else if (command.includes('comment') && (command.includes('reply') || command.includes('automate'))) {
+        response = `💬 Processing: "${searchInput}" - Redirecting to Comment Automation...`;
+        targetPage = 'comment-automation';
+      } else if (command.includes('ugc') || command.includes('ad')) {
+        response = `🎭 Processing: "${searchInput}" - Redirecting to UGC Ad Creator...`;
+        targetPage = 'ugc-ads';
+      } else {
+        response = `🤖 Processing: "${searchInput}" - Analyzing request...`;
+      }
+
+      const newActivity = {
+        id: Date.now(),
+        agent: 'Command Agent',
+        action: response,
+        timestamp: 'Just now',
+        icon: '🤖',
+        color: 'text-purple-500'
+      };
+      
+      setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
+      
+      if (targetPage) {
+        setTimeout(() => setActivePage(targetPage), 1500);
+      }
+      
+      setSearchInput('');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-800/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Sociact AI
-              </h1>
-              <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
-                2 Agents Active
-              </Badge>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-slate-900/50 backdrop-blur-sm border-r border-slate-700">
+        {/* Logo */}
+        <div className="p-6 border-b border-slate-700">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <Bot className="h-5 w-5 text-white" />
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              <span className="text-sm">⚙️</span>
-              Settings
-            </Button>
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+            <span className="text-xl font-bold text-white">Sociact AI</span>
           </div>
         </div>
-      </header>
 
-      {/* Command Bar */}
-      <div className="px-6 py-4 border-b border-slate-700/50">
-        <div className="flex items-center gap-4 max-w-4xl">
-          <div className="flex-1 flex items-center gap-2 bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700/50">
-            <span className="text-blue-400">⚡</span>
-            <span className="text-sm text-slate-400">Ask Sociact Agents to...</span>
-            
-            <Select value={selectedAction} onValueChange={setSelectedAction}>
-              <SelectTrigger className="w-40 bg-transparent border-slate-600 text-sm">
-                <SelectValue placeholder="Select action" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
-                {commandOptions.actions.map(action => (
-                  <SelectItem key={action} value={action} className="text-white hover:bg-slate-700">
-                    {action}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <span className="text-slate-400">for</span>
-
-            <Select value={selectedTarget} onValueChange={setSelectedTarget}>
-              <SelectTrigger className="w-44 bg-transparent border-slate-600 text-sm">
-                <SelectValue placeholder="Select target" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
-                {commandOptions.targets.map(target => (
-                  <SelectItem key={target} value={target} className="text-white hover:bg-slate-700">
-                    {target}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Button 
-            onClick={executeCommand}
-            disabled={!selectedAction || !selectedTarget || isExecuting}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6"
-          >
-            {isExecuting ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin w-4 h-4 border-2 border-white/20 border-t-white rounded-full"></div>
-                Execute {Math.round(executionProgress)}%
+        {/* Navigation */}
+        <div className="p-4 space-y-6">
+          {sidebarSections.map((section, index) => (
+            <div key={index}>
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                {section.title}
+              </h3>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activePage === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActivePage(item.id)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {item.badge && (
+                        <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            ) : (
-              <>⚡ Execute</>
-            )}
-          </Button>
+            </div>
+          ))}
+        </div>
+
+        {/* Active Agents Counter */}
+        <div className="absolute bottom-6 left-4 right-4">
+          <Card className="p-3 bg-slate-800/50 border-slate-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm text-slate-300">Active Agents</span>
+              </div>
+              <Badge variant="outline" className="border-green-400 text-green-400">
+                {agents.filter(a => a.status === 'active').length}
+              </Badge>
+            </div>
+          </Card>
         </div>
       </div>
 
-      <div className="flex">
-        {/* Main Content */}
-        <div className="flex-1 p-6">
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        <div className="flex-1 p-8">
+          {/* Header */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-2">Welcome back, Creator!</h2>
-            <p className="text-slate-400">Let's automate your social media and create amazing content with AI</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Welcome back, Creator! 👋
+            </h1>
+            <p className="text-slate-400">
+              Let's automate your social media and create amazing content with AI
+            </p>
           </div>
 
-          {/* Agent Panels */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {Object.entries(agents).map(([key, agent]) => (
-              <Card key={key} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${getStatusDot(agent.status)} animate-pulse`}></div>
-                      <div>
-                        <CardTitle className="text-lg">{agent.name}</CardTitle>
-                        <p className="text-sm text-slate-400 mt-1">{agent.description}</p>
-                      </div>
+          {/* Search Bar */}
+          <div className="mb-8">
+            <form onSubmit={handleSearch} className="flex items-center space-x-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Ask Sociact Agents to... generate 5 captions & schedule them"
+                  className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                />
+              </div>
+              <Button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-4">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Execute
+              </Button>
+            </form>
+          </div>
+
+          {/* Main Feature Cards */}
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            {mainFeatures.map((feature) => {
+              const Icon = feature.icon;
+              const statusInfo = getAgentStatus(feature.status);
+              return (
+                <Card key={feature.id} className="p-6 bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 group cursor-pointer" onClick={() => setActivePage(feature.id)}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 rounded-xl ${feature.bgColor} group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-6 w-6 text-white" />
                     </div>
-                    <Badge variant="outline" className={`${getStatusColor(agent.status)} border-current capitalize`}>
-                      {agent.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-2 h-2 rounded-full ${statusInfo.color} animate-pulse`}></div>
+                      <span className="text-xs text-slate-400">{feature.status}</span>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Progress</span>
-                      <span className="font-medium">{Math.round(agent.progress)}%</span>
-                    </div>
-                    <Progress value={agent.progress} className="h-2" />
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-400">{agent.currentTask}</span>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-slate-700">
-                          ▶️
-                        </Button>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-slate-700">
-                          ⏸️
-                        </Button>
-                      </div>
-                    </div>
+                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-4">
+                    {feature.description}
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="border-slate-600 hover:border-blue-400 hover:bg-blue-400/10 transition-all"
+                  >
+                    Launch Tool
+                  </Button>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-4 gap-4">
+            {mockData.stats.map((stat, index) => (
+              <Card key={index} className="p-4 bg-slate-800/30 border-slate-700">
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg ${stat.color}`}>
+                    {stat.icon === 'video' && <Video className="h-4 w-4 text-white" />}
+                    {stat.icon === 'image' && <ImageIcon className="h-4 w-4 text-white" />}
+                    {stat.icon === 'comment' && <MessageCircle className="h-4 w-4 text-white" />}
+                    {stat.icon === 'edit' && <Edit3 className="h-4 w-4 text-white" />}
                   </div>
-                </CardContent>
+                  <div>
+                    <p className="text-sm text-slate-400">{stat.label}</p>
+                    <p className="text-xl font-semibold text-white">{stat.value}</p>
+                  </div>
+                </div>
               </Card>
             ))}
           </div>
-
-          {/* Quick Actions */}
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm mb-8">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {quickActions.map((action) => (
-                  <Button
-                    key={action.id}
-                    variant="outline"
-                    onClick={() => handleQuickAction(action.id)}
-                    disabled={activeQuickAction === action.id}
-                    className="h-20 flex flex-col items-center gap-2 bg-slate-700/30 border-slate-600 hover:bg-slate-700/50 hover:border-slate-500 transition-all duration-200"
-                  >
-                    {activeQuickAction === action.id ? (
-                      <div className="animate-spin w-6 h-6 border-2 border-current/20 border-t-current rounded-full"></div>
-                    ) : (
-                      <span className="text-lg">{action.icon}</span>
-                    )}
-                    <span className="text-xs">{action.label}</span>
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Right Sidebar - Live Activity & Stats */}
-        <div className="w-80 border-l border-slate-700/50 bg-slate-800/30 backdrop-blur-sm">
-          {/* Live Activity Feed */}
-          <div className="p-6 border-b border-slate-700/50">
+        {/* Right Sidebar - Activity Feed */}
+        <div className="w-80 p-6 border-l border-slate-700">
+          <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Live Activity Feed</h3>
-              <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-white">Live Activity Feed</h3>
+              <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-xs text-green-400">Live</span>
               </div>
             </div>
-            
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-700/30 transition-all duration-200 animate-fade-in">
-                  <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-sm">
-                    {activity.icon}
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {activities.slice(0, 8).map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3 p-3 bg-slate-800/30 rounded-lg hover:bg-slate-800/50 transition-colors">
+                  <div className="flex-shrink-0">
+                    <span className="text-base">{activity.icon}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm">
-                      <span className="font-medium text-blue-400">{activity.agent}</span>
-                      <br />
-                      <span className="text-slate-300">{activity.action}</span>
+                    <p className="text-sm font-medium text-white truncate">
+                      {activity.agent}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">{activity.timestamp}</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {activity.action}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {activity.timestamp}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Today's Stats */}
-          <div className="p-6">
-            <h3 className="font-semibold mb-4">Today's Stats</h3>
-            <div className="space-y-4">
-              {todaysStats.map((stat, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-600 flex items-center justify-center text-sm">
-                      {stat.icon}
-                    </div>
-                    <span className="text-sm">{stat.label}</span>
-                  </div>
-                  <span className="font-bold text-lg">{stat.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Add Button */}
+          <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Project
+          </Button>
         </div>
       </div>
     </div>
