@@ -1,479 +1,438 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import React, { useState } from 'react';
+import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Switch } from './ui/switch';
+import { 
+  ShoppingBag, 
+  Play,
+  Sparkles,
+  Upload,
+  Zap,
+  ChevronDown,
+  Download,
+  Share2,
+  Settings,
+  Target,
+  TrendingUp,
+  Palette,
+  Eye
+} from 'lucide-react';
 
 const ProductAdCreator = () => {
-  const [productImage, setProductImage] = useState(null);
-  const [productName, setProductName] = useState('');
-  const [productFeatures, setProductFeatures] = useState('');
-  const [campaignGoal, setCampaignGoal] = useState('awareness');
-  const [adFormat, setAdFormat] = useState('static');
-  const [brandColors, setBrandColors] = useState('#3B82F6');
-  const [includePrice, setIncludePrice] = useState(true);
-  const [productPrice, setProductPrice] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generateProgress, setGenerateProgress] = useState(0);
-  const [generatedAds, setGeneratedAds] = useState([]);
-  const [selectedAd, setSelectedAd] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState('product-showcase');
+  const [productUrl, setProductUrl] = useState('');
+  const [adObjective, setAdObjective] = useState('sales');
+  const [brandVoice, setBrandVoice] = useState('professional');
 
-  const mockAds = [
+  const [generatedAds, setGeneratedAds] = useState([
     {
       id: 1,
-      title: 'Wireless Headphones - Premium',
-      product: 'SoundMax Pro',
-      thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
-      format: 'Static Image',
-      goal: 'Purchase',
-      impressions: '125K',
-      clicks: '4.2K',
-      ctr: '3.4%',
-      timestamp: '3 hours ago',
-      status: 'active'
+      title: 'Lavender Glow Serum - Premium Skincare',
+      thumbnail: 'https://images.unsplash.com/photo-1720962158789-9389a4f399da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      duration: '0:30',
+      template: 'Product Showcase',
+      cta: 'Shop Now - 25% Off',
+      performance: 'High Converting',
+      timestamp: '1 hour ago'
     },
     {
       id: 2,
-      title: 'Fitness Tracker Campaign',
-      product: 'FitBand Ultra',
-      thumbnail: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=400',
-      format: 'Video',
-      goal: 'Awareness',
-      impressions: '89K',
-      clicks: '2.8K',
-      ctr: '3.1%',
-      timestamp: '5 hours ago',
-      status: 'active'
+      title: 'Smart Watch Pro - Tech Innovation',
+      thumbnail: 'https://images.unsplash.com/photo-1720962158858-5fb16991d2b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHx0ZWNobm9sb2d5JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc1MzAxMDM0M3ww&ixlib=rb-4.1.0&q=85',
+      duration: '0:45',
+      template: 'Feature Demo',
+      cta: 'Pre-Order Today',
+      performance: 'Trending',
+      timestamp: '3 hours ago'
+    }
+  ]);
+
+  const adTemplates = [
+    {
+      id: 'product-showcase',
+      name: 'Product Showcase',
+      description: 'Beautiful product displays with elegant animations',
+      style: '360° Views',
+      duration: '15-30s',
+      badge: 'Popular',
+      icon: '✨'
     },
     {
-      id: 3,
-      title: 'Smart Home Device Ad',
-      product: 'HomeAI Assistant',
-      thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400',
-      format: 'Carousel',
-      goal: 'Lead Generation',
-      impressions: '156K',
-      clicks: '6.1K',
-      ctr: '3.9%',
-      timestamp: '1 day ago',
-      status: 'completed'
+      id: 'feature-demo',
+      name: 'Feature Demo',
+      description: 'Highlight key features and benefits',
+      style: 'Interactive',
+      duration: '30-60s',
+      badge: 'Converting',
+      icon: '🎯'
+    },
+    {
+      id: 'lifestyle-story',
+      name: 'Lifestyle Story',
+      description: 'Product in real-life scenarios and contexts',
+      style: 'Narrative',
+      duration: '45-60s',
+      badge: null,
+      icon: '🌟'
+    },
+    {
+      id: 'comparison',
+      name: 'Comparison Ad',
+      description: 'Show advantages over competitors',
+      style: 'Analytical',
+      duration: '30-45s',
+      badge: 'Hot',
+      icon: '⚔️'
     }
   ];
 
-  useEffect(() => {
-    if (isGenerating) {
-      const interval = setInterval(() => {
-        setGenerateProgress(prev => {
-          if (prev >= 100) {
-            setIsGenerating(false);
-            
-            const newAd = {
-              id: Date.now(),
-              title: `${productName} - ${campaignGoal}`,
-              product: productName,
-              thumbnail: mockAds[Math.floor(Math.random() * mockAds.length)].thumbnail,
-              format: adFormat,
-              goal: campaignGoal,
-              impressions: '0',
-              clicks: '0',
-              ctr: '0%',
-              timestamp: 'just now',
-              status: 'draft'
-            };
-            
-            setGeneratedAds(prev => [newAd, ...prev]);
-            return 0;
-          }
-          return prev + Math.random() * 12;
-        });
-      }, 250);
-      return () => clearInterval(interval);
-    }
-  }, [isGenerating, productName, campaignGoal, adFormat]);
+  const adObjectives = [
+    { value: 'sales', label: 'Drive Sales', description: 'Maximize purchases and revenue' },
+    { value: 'awareness', label: 'Brand Awareness', description: 'Increase product visibility' },
+    { value: 'consideration', label: 'Product Consideration', description: 'Generate interest and research' },
+    { value: 'retargeting', label: 'Retargeting', description: 'Re-engage previous visitors' }
+  ];
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setProductImage(file);
-    } else {
-      alert('Please select a valid image file');
-    }
-  };
+  const brandVoices = [
+    { value: 'professional', label: 'Professional', description: 'Formal, trustworthy, expert tone' },
+    { value: 'friendly', label: 'Friendly', description: 'Warm, approachable, conversational' },
+    { value: 'bold', label: 'Bold', description: 'Confident, edgy, attention-grabbing' },
+    { value: 'luxury', label: 'Luxury', description: 'Premium, exclusive, sophisticated' }
+  ];
 
-  const handleGenerate = () => {
-    if (!productName.trim() || !productFeatures.trim()) {
-      alert('Please fill in product name and features');
-      return;
-    }
+  const generateAd = () => {
+    if (!productUrl.trim()) return;
+    
     setIsGenerating(true);
-    setGenerateProgress(0);
+    
+    setTimeout(() => {
+      const templates = ['Product Showcase', 'Feature Demo', 'Lifestyle Story', 'Comparison'];
+      const ctas = ['Shop Now - 25% Off', 'Get Yours Today', 'Limited Time Offer', 'Free Shipping'];
+      const performances = ['High Converting', 'Trending', 'Viral Potential', 'ROI Optimized'];
+      
+      const newAd = {
+        id: Date.now(),
+        title: `${productUrl.split('/')[2] || 'Product'} - Professional Ad`,
+        thumbnail: 'https://images.unsplash.com/photo-1590417286292-4274afeee179?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxkaWdpdGFsJTIwd29ya3NwYWNlfGVufDB8fHx8MTc1MzAxMDM1MHww&ixlib=rb-4.1.0&q=85',
+        duration: '0:35',
+        template: templates[Math.floor(Math.random() * templates.length)],
+        cta: ctas[Math.floor(Math.random() * ctas.length)],
+        performance: performances[Math.floor(Math.random() * performances.length)],
+        timestamp: 'Just now'
+      };
+      
+      setGeneratedAds(prev => [newAd, ...prev]);
+      setIsGenerating(false);
+      setProductUrl('');
+    }, 5000);
   };
-
-  const campaignGoals = [
-    { value: 'awareness', label: 'Brand Awareness' },
-    { value: 'consideration', label: 'Consideration' },
-    { value: 'purchase', label: 'Purchase Intent' },
-    { value: 'leads', label: 'Lead Generation' },
-    { value: 'traffic', label: 'Website Traffic' },
-    { value: 'engagement', label: 'Engagement' }
-  ];
-
-  const adFormats = [
-    { value: 'static', label: 'Static Image' },
-    { value: 'video', label: 'Video Ad' },
-    { value: 'carousel', label: 'Carousel' },
-    { value: 'collection', label: 'Collection Ad' },
-    { value: 'slideshow', label: 'Slideshow' }
-  ];
-
-  const allAds = [...generatedAds, ...mockAds];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-8 py-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Product Ad Creator</h1>
+            <p className="text-slate-400">Create professional product advertisements that drive sales</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+              <Zap className="h-3 w-3 mr-1" />
+              Credits: 1,247
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-8">
+        {/* Featured Ad Templates */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-2xl">
-              📦
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">Product Ad Creator</h1>
-              <p className="text-slate-400">Design compelling product advertisements with AI assistance</p>
-            </div>
-            <div className="ml-auto flex gap-2">
-              <Badge variant="secondary" className="bg-indigo-500/20 text-indigo-400">
-                🟢 AI Designer Ready
-              </Badge>
-              <Badge variant="secondary">
-                {generatedAds.length + mockAds.length} Ads Created
-              </Badge>
-            </div>
+          <h2 className="text-2xl font-bold text-white mb-6">Professional Ad Templates</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {adTemplates.map((template) => (
+              <Card 
+                key={template.id}
+                className={`p-6 cursor-pointer transition-all duration-200 ${
+                  selectedTemplate === template.id
+                    ? 'bg-blue-600/20 border-blue-500/50 ring-2 ring-blue-500/30'
+                    : 'bg-slate-800/50 border-slate-700 hover:bg-slate-800/70'
+                }`}
+                onClick={() => setSelectedTemplate(template.id)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-2xl">
+                    {template.icon}
+                  </div>
+                  {template.badge && (
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs">
+                      {template.badge}
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">{template.name}</h3>
+                <p className="text-sm text-slate-400 mb-3">{template.description}</p>
+                <div className="flex items-center justify-between text-xs text-slate-500">
+                  <span>{template.style}</span>
+                  <span>{template.duration}</span>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Creation Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span>🎨</span>
-                  Create Product Ad
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Product Image</label>
-                  <div className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="product-image"
-                    />
-                    <label htmlFor="product-image" className="cursor-pointer flex flex-col items-center gap-2">
-                      {productImage ? (
-                        <div className="w-20 h-20 bg-green-500/20 border border-green-500/30 rounded-lg flex items-center justify-center">
-                          <span className="text-green-400">✅</span>
-                        </div>
-                      ) : (
-                        <div className="w-20 h-20 bg-slate-700 rounded-lg flex items-center justify-center">
-                          📸
-                        </div>
-                      )}
-                      <p className="text-xs font-medium">Upload product image</p>
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Product Name</label>
-                  <Input
-                    placeholder="Enter your product name..."
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Key Features</label>
-                  <Textarea
-                    placeholder="List the main features and benefits of your product..."
-                    value={productFeatures}
-                    onChange={(e) => setProductFeatures(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Campaign Goal</label>
-                  <Select value={campaignGoal} onValueChange={setCampaignGoal}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {campaignGoals.map(goal => (
-                        <SelectItem key={goal.value} value={goal.value}>{goal.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Ad Format</label>
-                  <Select value={adFormat} onValueChange={setAdFormat}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      {adFormats.map(format => (
-                        <SelectItem key={format.value} value={format.value}>{format.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Brand Colors</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={brandColors}
-                      onChange={(e) => setBrandColors(e.target.value)}
-                      className="w-10 h-10 rounded border border-slate-600 bg-slate-700"
-                    />
-                    <Input
-                      value={brandColors}
-                      onChange={(e) => setBrandColors(e.target.value)}
-                      className="bg-slate-700 border-slate-600 text-white"
-                    />
-                  </div>
-                </div>
-
+        <div className="grid grid-cols-12 gap-8">
+          {/* Left Panel - Creation Form */}
+          <div className="col-span-4">
+            <div className="space-y-6">
+              {/* Product Information */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Product URL or Details</label>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                    <div>
-                      <label className="text-sm font-medium text-slate-300">Include Price</label>
-                      <p className="text-xs text-slate-400">Show product price in ad</p>
-                    </div>
-                    <Switch
-                      checked={includePrice}
-                      onCheckedChange={setIncludePrice}
-                    />
+                  <input
+                    type="url"
+                    value={productUrl}
+                    onChange={(e) => setProductUrl(e.target.value)}
+                    placeholder="https://your-product-page.com"
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  />
+                  <p className="text-xs text-slate-400">We'll extract product details, images, and pricing automatically</p>
+                </div>
+              </Card>
+
+              {/* Visual Assets Upload */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Custom Assets (Optional)</label>
+                <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors">
+                  <Upload className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-300 font-medium mb-1">Upload product images or videos</p>
+                  <p className="text-sm text-slate-500">High-quality PNG, JPG, MP4 files</p>
+                </div>
+              </Card>
+
+              {/* Campaign Objective */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Campaign Objective</label>
+                <div className="relative">
+                  <select 
+                    value={adObjective}
+                    onChange={(e) => setAdObjective(e.target.value)}
+                    className="w-full appearance-none bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  >
+                    {adObjectives.map((objective) => (
+                      <option key={objective.value} value={objective.value}>
+                        {objective.label} - {objective.description}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                </div>
+              </Card>
+
+              {/* Brand Voice */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <label className="block text-sm font-semibold text-white mb-3">Brand Voice & Style</label>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <select 
+                      value={brandVoice}
+                      onChange={(e) => setBrandVoice(e.target.value)}
+                      className="w-full appearance-none bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                    >
+                      {brandVoices.map((voice) => (
+                        <option key={voice.value} value={voice.value}>
+                          {voice.label} - {voice.description}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                   </div>
                   
-                  {includePrice && (
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-medium text-slate-300 mb-2 block">Product Price</label>
-                      <Input
-                        placeholder="$99.99"
-                        value={productPrice}
-                        onChange={(e) => setProductPrice(e.target.value)}
-                        className="bg-slate-700 border-slate-600 text-white"
-                      />
+                      <label className="block text-sm text-slate-300 mb-2">Primary Color</label>
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg border-2 border-slate-600"></div>
+                        <input type="color" value="#3B82F6" className="w-10 h-10 rounded-lg border-2 border-slate-600" />
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                {isGenerating && (
-                  <div className="p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-indigo-400 font-medium">Creating Ad...</span>
-                      <span className="text-indigo-400">{Math.round(generateProgress)}%</span>
+                    <div>
+                      <label className="block text-sm text-slate-300 mb-2">Style</label>
+                      <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                        <option value="modern">Modern</option>
+                        <option value="classic">Classic</option>
+                        <option value="minimalist">Minimalist</option>
+                        <option value="bold">Bold</option>
+                      </select>
                     </div>
-                    <Progress value={generateProgress} className="h-2" />
-                    <p className="text-sm text-slate-400 mt-2">
-                      {generateProgress < 25 ? 'Analyzing product...' : 
-                       generateProgress < 50 ? 'Generating copy...' :
-                       generateProgress < 75 ? 'Designing layout...' : 'Finalizing ad...'}
-                    </p>
                   </div>
-                )}
+                </div>
+              </Card>
 
+              {/* Advanced Options */}
+              <Card className="p-6 bg-slate-800/50 border-slate-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-white">Advanced Options</h4>
+                  <Settings className="h-4 w-4 text-slate-400" />
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Call-to-Action</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="shop-now">Shop Now</option>
+                      <option value="get-yours">Get Yours Today</option>
+                      <option value="learn-more">Learn More</option>
+                      <option value="limited-offer">Limited Time Offer</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Platform Optimization</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="instagram">Instagram Feed</option>
+                      <option value="facebook">Facebook Ads</option>
+                      <option value="tiktok">TikTok Ads</option>
+                      <option value="youtube">YouTube Pre-roll</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Duration</label>
+                    <select className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-400">
+                      <option value="15">15 seconds</option>
+                      <option value="30">30 seconds</option>
+                      <option value="60">60 seconds</option>
+                    </select>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Generate Button */}
+              <div className="pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-white">Credits required:</span>
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">30 Credits</Badge>
+                </div>
                 <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !productName.trim() || !productFeatures.trim()}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+                  onClick={generateAd}
+                  disabled={isGenerating || !productUrl.trim()}
+                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium py-3"
                 >
                   {isGenerating ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white/20 border-t-white rounded-full mr-2"></div>
-                      Creating...
-                    </>
+                    <div className="flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                      Creating Product Ad...
+                    </div>
                   ) : (
-                    <>📦 Create Product Ad</>
+                    <div className="flex items-center justify-center">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Create Product Ad
+                    </div>
                   )}
                 </Button>
-              </CardContent>
-            </Card>
 
-            {/* Ad Templates */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">🎯 Ad Templates</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {[
-                    'Flash Sale Banner',
-                    'Product Showcase',
-                    'Feature Highlight',
-                    'Comparison Chart',
-                    'Testimonial Overlay'
-                  ].map((template, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start text-xs"
-                    >
-                      {template}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                {isGenerating && (
+                  <div className="mt-4">
+                    <Progress value={60} className="h-2 bg-slate-700" />
+                    <p className="text-xs text-slate-400 mt-2 text-center">Analyzing product and generating professional ad...</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Ad Gallery */}
-          <div className="lg:col-span-3 space-y-6">
-            {selectedAd && (
-              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-6">
-                    <div className="relative">
-                      <img
-                        src={selectedAd.thumbnail}
-                        alt={selectedAd.title}
-                        className="w-80 h-48 object-cover rounded-lg"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
-                        <Button size="lg" className="bg-white/90 text-black hover:bg-white">
-                          👁️ Preview Ad
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">{selectedAd.title}</h3>
-                      <p className="text-slate-300 mb-4">{selectedAd.product}</p>
-                      <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">Impressions</p>
-                          <p className="text-lg font-semibold">{selectedAd.impressions}</p>
-                        </div>
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">Clicks</p>
-                          <p className="text-lg font-semibold text-blue-400">{selectedAd.clicks}</p>
-                        </div>
-                        <div className="p-3 bg-slate-700/30 rounded-lg">
-                          <p className="text-sm text-slate-400">CTR</p>
-                          <p className="text-lg font-semibold text-green-400">{selectedAd.ctr}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 mb-4">
-                        <Badge variant="outline">{selectedAd.format}</Badge>
-                        <Badge variant="outline">{selectedAd.goal}</Badge>
-                        <Badge 
-                          variant={selectedAd.status === 'active' ? 'default' : 'secondary'}
-                          className={selectedAd.status === 'active' ? 'bg-green-500' : ''}
-                        >
-                          {selectedAd.status}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-3">
-                        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500">
-                          📥 Download Ad
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          ✏️ Edit Design
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          🎯 Launch Campaign
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          📊 View Analytics
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedAd(null)}
-                        >
-                          ✕ Close
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          {/* Right Panel - Generated Ads */}
+          <div className="col-span-8">
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Professional Product Ads</h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="border-slate-600 text-slate-300">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    {generatedAds.length} Ads Created
+                  </Badge>
+                </div>
+              </div>
+            </div>
 
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Product Ad Gallery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {allAds.map((ad) => (
-                    <div
-                      key={ad.id}
-                      className="group relative bg-slate-700/30 rounded-lg overflow-hidden hover:bg-slate-700/50 transition-all duration-200 cursor-pointer"
-                      onClick={() => setSelectedAd(ad)}
-                    >
+            {generatedAds.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <ShoppingBag className="h-10 w-10 text-slate-400" />
+                </div>
+                <p className="text-slate-400 text-lg mb-2">No product ads created yet</p>
+                <p className="text-slate-500 text-sm">Add your product details to start creating professional advertisements</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
+                {generatedAds.map((ad) => (
+                  <div key={ad.id} className="group">
+                    <Card className="overflow-hidden bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all">
                       <div className="relative">
-                        <img
-                          src={ad.thumbnail}
+                        <img 
+                          src={ad.thumbnail} 
                           alt={ad.title}
-                          className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-full aspect-video object-cover"
                         />
                         
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <Button
-                            size="sm"
-                            className="bg-white/90 text-black hover:bg-white"
-                          >
-                            👁️ Preview
+                        {/* Play Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button size="lg" className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm">
+                            <Play className="h-6 w-6" />
                           </Button>
                         </div>
 
-                        <div className="absolute top-2 right-2 space-y-1">
-                          <Badge 
-                            variant={ad.status === 'active' ? 'default' : 'secondary'}
-                            className={`text-xs block ${ad.status === 'active' ? 'bg-green-500' : ''}`}
-                          >
-                            {ad.status}
+                        {/* Performance Badge */}
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-blue-500/80 text-white text-xs">
+                            {ad.performance}
                           </Badge>
                         </div>
+
+                        {/* Duration */}
+                        <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-xs text-white">
+                          {ad.duration}
+                        </div>
                       </div>
-                      
+
                       <div className="p-4">
-                        <h3 className="font-medium text-white truncate mb-1">{ad.title}</h3>
-                        <p className="text-sm text-slate-400 truncate mb-2">{ad.product}</p>
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline" className="text-xs">{ad.format}</Badge>
-                          <span className="text-xs text-slate-500">{ad.timestamp}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <div className="flex gap-2">
-                            <span>👁️ {ad.impressions}</span>
-                            <span>👆 {ad.ctr}</span>
+                        <h4 className="font-medium text-white mb-2 line-clamp-2">{ad.title}</h4>
+                        <div className="text-xs text-slate-400 mb-2">
+                          <div className="flex items-center justify-between">
+                            <span>Template: {ad.template}</span>
+                            <span>{ad.timestamp}</span>
                           </div>
-                          {ad.timestamp === 'just now' && (
-                            <Badge variant="default" className="bg-indigo-500 text-xs">New</Badge>
-                          )}
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-green-400 mb-3 bg-green-500/10 rounded px-2 py-1">
+                          <span>CTA: {ad.cta}</span>
+                          <Target className="h-3 w-3" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" className="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 hover:bg-blue-600/30">
+                            <Download className="h-3 w-3 mr-1" />
+                            Download
+                          </Button>
+                          <Button size="sm" variant="ghost" className="px-2">
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="px-2">
+                            <Eye className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {generatedAds.length > 0 && (
+              <div className="text-center mt-8">
+                <Button variant="outline" className="border-slate-600">
+                  Load More Ads
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
